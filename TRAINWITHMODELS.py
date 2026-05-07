@@ -331,7 +331,7 @@ if __name__ == "__main__":
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save("4PlayerTraining-Random/FOUR_PLAYER_RANDOM_MODEL_final")
-        venv.save("4PlayerTraining-Random/four_player_random_vec_normalize.pkl")
+        model.save("FOUR_PLAYER_RANDOM_MODEL_final")
+        venv.save("four_player_random_vec_normalize.pkl")
         print("Training finished + saved.")
  
