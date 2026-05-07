@@ -264,7 +264,9 @@ def make_env():
             "reward_function": reward,
             "invalid_action_reward": -1.0,
             "enemies": [
-                ValueFunctionPlayer(Color.RED),
+                RandomPlayer(Color.RED),
+                RandomPlayer(Color.ORANGE),
+                RandomPlayer(Color.WHITE),
             ],
         },
     )
@@ -282,8 +284,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODELVFTRAIN/VALUE_TRAINED_MODEL_final1500000.0"
-    CONTINUE_VECNORM = "FINALMODELVFTRAIN/value_trained_vec_normalize1.5M.pkl"
+    CONTINUE_FROM = ""
+    CONTINUE_VECNORM = ""
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
@@ -312,8 +314,8 @@ if __name__ == "__main__":
             venv,
             device=device,
             verbose=1,
-            learning_rate=1e-5,
-            ent_coef=0.005,
+            learning_rate=5e-5,
+            ent_coef=0.02,
             n_steps=1024,
             batch_size=512,
             gamma=0.99,
@@ -324,12 +326,12 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    hours = 1/10
+    hours = 2
     timesteps = 5000000*hours
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save(f"VALUE_TRAINED_MODEL_final{timesteps}")
-        venv.save("value_trained_vec_normalize.pkl")
+        model.save("4PlayerTraining-Random/FOUR_PLAYER_RANDOM_MODEL_final")
+        venv.save("4PlayerTraining-Random/four_player_random_vec_normalize.pkl")
         print("Training finished + saved.")
  
