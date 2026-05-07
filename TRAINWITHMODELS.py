@@ -266,7 +266,7 @@ def make_env():
             "reward_function": reward,
             "invalid_action_reward": -1.0,
             "enemies": [
-                WeightedRandomPlayer(Color.RED),
+                ValueFunctionPlayer(Color.RED),
                 WeightedRandomPlayer(Color.ORANGE),
                 WeightedRandomPlayer(Color.WHITE),
             ],
@@ -286,8 +286,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/FOUR_PLAYER_RANDOM_MODEL_WR13M.zip"
-    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/four_player_random_vec_normalizeWR13M.pkl"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/FOUR_PLAYER_RANDOM_MODEL_WR16M.zip"
+    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/four_player_random_vec_normalizeWR16M.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
