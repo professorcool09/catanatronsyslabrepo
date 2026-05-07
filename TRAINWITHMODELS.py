@@ -301,6 +301,8 @@ if __name__ == "__main__":
             CONTINUE_FROM,
             env=venv,
             device=device,
+            learning_rate=1e-5,
+            ent_coef=0.005,
         )
         model.verbose = 1
     else:
@@ -311,7 +313,7 @@ if __name__ == "__main__":
             device=device,
             verbose=1,
             learning_rate=1e-5,
-            ent_coef=0.01,
+            ent_coef=0.005,
             n_steps=1024,
             batch_size=512,
             gamma=0.99,
