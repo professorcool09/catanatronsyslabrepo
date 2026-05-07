@@ -11,7 +11,8 @@ from catanatron.gym.envs.catanatron_env import to_action_space
 from sb3_contrib.ppo_mask import MaskablePPO
 
 
-FEATURES = get_feature_ordering(num_players=2)
+# IMPORTANT: 4-player model needs 4-player feature ordering
+FEATURES = get_feature_ordering(num_players=4)
 
 
 class PPOPlayer(Player):
@@ -20,10 +21,13 @@ class PPOPlayer(Player):
 
         model_path = model_path or os.getenv(
             "CATAN_PPO_MODEL",
-            "VALUE_TRAINED_MODEL_final500000.0"
+            "FOUR_PLAYER_RANDOM_MODEL_final"
         )
 
-        vecnorm_path = os.getenv("CATAN_VECNORM", "value_trained_vec_normalize.pkl")
+        vecnorm_path = os.getenv(
+            "CATAN_VECNORM",
+            "four_player_random_vec_normalize.pkl"
+        )
 
         self.model = MaskablePPO.load(model_path)
 
@@ -35,7 +39,15 @@ class PPOPlayer(Player):
 
     def decide(self, game, playable_actions):
         sample = create_sample(game, self.color)
-        obs = np.array([float(sample[f]) for f in FEATURES], dtype=np.float32)
+
+        try:
+            obs = np.array([float(sample[f]) for f in FEATURES], dtype=np.float32)
+        except KeyError as e:
+            print("Feature mismatch.")
+            print("Missing feature:", e)
+            print("Expected feature count:", len(FEATURES))
+            print("Sample feature count:", len(sample))
+            return playable_actions[0]
 
         obs = obs.reshape(1, -1)
         obs = self.vecnorm.normalize_obs(obs)
@@ -56,8 +68,6 @@ class PPOPlayer(Player):
         if not idx_to_action:
             return playable_actions[0]
 
-        # If there is only one legal move, no need to ask the model.
-        # This avoids MaskablePPO numerical issues with single-action masks.
         if len(idx_to_action) == 1:
             return next(iter(idx_to_action.values()))
 

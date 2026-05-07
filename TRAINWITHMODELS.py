@@ -11,6 +11,8 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, VecNormalize
 from catanatron.models.player import Color
 from catanatron.players.value import ValueFunctionPlayer
 from catanatron.models.player import RandomPlayer
+from catanatron.models.player import WeightedRandomPlayer
+
 
 
 # -------------------------
@@ -264,9 +266,9 @@ def make_env():
             "reward_function": reward,
             "invalid_action_reward": -1.0,
             "enemies": [
-                RandomPlayer(Color.RED),
-                RandomPlayer(Color.ORANGE),
-                RandomPlayer(Color.WHITE),
+                WeightedRandomPlayer(Color.RED),
+                WeightedRandomPlayer(Color.ORANGE),
+                WeightedRandomPlayer(Color.WHITE),
             ],
         },
     )
