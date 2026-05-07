@@ -11,7 +11,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, VecNormalize
 from catanatron.models.player import Color
 from catanatron.players.value import ValueFunctionPlayer
 from catanatron.models.player import RandomPlayer
-from catanatron.models.player import WeightedRandomPlayer
+from catanatron.players.weighted_random import WeightedRandomPlayer
 
 
 
@@ -286,8 +286,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = ""
-    CONTINUE_VECNORM = ""
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/FOUR_PLAYER_RANDOM_MODEL_Random10M"
+    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/four_player_random_vec_normalizeRandom10M.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
@@ -328,8 +328,8 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    hours = 2
-    timesteps = 5000000*hours
+    hours = 1
+    timesteps = 3000000*hours
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
