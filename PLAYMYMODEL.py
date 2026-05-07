@@ -20,10 +20,10 @@ class PPOPlayer(Player):
 
         model_path = model_path or os.getenv(
             "CATAN_PPO_MODEL",
-            "MYMODEL_final40000000"
+            "VALUE_TRAINED_MODEL_final10000000"
         )
 
-        vecnorm_path = os.getenv("CATAN_VECNORM", "vec_normalize.pkl")
+        vecnorm_path = os.getenv("CATAN_VECNORM", "value_trained_vec_normalize.pkl")
 
         self.model = MaskablePPO.load(model_path)
 

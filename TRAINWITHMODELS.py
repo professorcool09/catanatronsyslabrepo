@@ -256,7 +256,7 @@ class ExpansionReward:
 # SINGLE ENV CREATOR
 # -------------------------
 def make_env():
-    reward = ExpansionReward()
+    reward = RewardIteration2()
 
     env = gym.make(
         "catanatron/Catanatron-v0",
@@ -310,8 +310,8 @@ if __name__ == "__main__":
             venv,
             device=device,
             verbose=1,
-            learning_rate=1e-4,
-            ent_coef=0.05,
+            learning_rate=1e-5,
+            ent_coef=0.01,
             n_steps=1024,
             batch_size=512,
             gamma=0.99,
