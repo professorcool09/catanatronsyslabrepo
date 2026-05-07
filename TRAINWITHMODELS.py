@@ -282,8 +282,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODELVFTRAIN/VALUE_TRAINED_MODEL_final1000000.0"
-    CONTINUE_VECNORM = "FINALMODELVFTRAIN/value_trained_vec_normalize1M.pkl"
+    CONTINUE_FROM = "FINALMODELVFTRAIN/VALUE_TRAINED_MODEL_final1500000.0"
+    CONTINUE_VECNORM = "FINALMODELVFTRAIN/value_trained_vec_normalize1.5M.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
