@@ -286,8 +286,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/FOUR_PLAYER_RANDOM_MODEL_Random10M"
-    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/four_player_random_vec_normalizeRandom10M.pkl"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/FOUR_PLAYER_RANDOM_MODEL_WR13M.zip"
+    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/four_player_random_vec_normalizeWR13M.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
@@ -328,8 +328,8 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    hours = 1
-    timesteps = 3000000*hours
+    ms = 2
+    timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
