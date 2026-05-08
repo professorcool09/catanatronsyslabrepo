@@ -15,7 +15,7 @@ from sb3_contrib.ppo_mask import MaskablePPO
 FEATURES = get_feature_ordering(num_players=4)
 
 
-class PPOPlayer(Player):
+class RLPlayer(Player):
     def __init__(self, color, model_path=None):
         super().__init__(color)
 
@@ -94,4 +94,4 @@ class PPOPlayer(Player):
         return idx_to_action.get(action_idx, playable_actions[0])
 
 
-register_cli_player("PPO", PPOPlayer)
+register_cli_player("RL", RLPlayer)

@@ -267,7 +267,7 @@ def make_env():
             "invalid_action_reward": -1.0,
             "enemies": [
                 ValueFunctionPlayer(Color.RED),
-                WeightedRandomPlayer(Color.ORANGE),
+                ValueFunctionPlayer(Color.ORANGE),
                 WeightedRandomPlayer(Color.WHITE),
             ],
         },
@@ -286,8 +286,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/FOUR_PLAYER_RANDOM_MODEL_finalWR18M"
-    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/four_player_random_vec_normalizeWR18M.pkl"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/WFF22M"
+    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/WFF22M.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
@@ -328,7 +328,7 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    ms = 1
+    ms = 10
     timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
