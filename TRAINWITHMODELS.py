@@ -286,7 +286,7 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/FOUR_PLAYER_RANDOM_MODEL_WR16M.zip"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/FOUR_PLAYER_RANDOM_MODEL_finalWR16M"
     CONTINUE_VECNORM = "FINALMODEL4PLAYERS/four_player_random_vec_normalizeWR16M.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
