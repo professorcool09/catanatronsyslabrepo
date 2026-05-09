@@ -268,7 +268,7 @@ def make_env():
             "enemies": [
                 ValueFunctionPlayer(Color.RED),
                 ValueFunctionPlayer(Color.ORANGE),
-                WeightedRandomPlayer(Color.WHITE),
+                ValueFunctionPlayer(Color.WHITE),
             ],
         },
     )
@@ -286,8 +286,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/WFF22M"
-    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/WFF22M.pkl"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/WFF32M"
+    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/WFF32M.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
@@ -328,7 +328,7 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    ms = 10
+    ms = 1
     timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
