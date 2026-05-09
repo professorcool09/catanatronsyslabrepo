@@ -210,12 +210,153 @@ class RewardIteration3:
         self.prev_roads = roads
 
         return float(reward)
+class RewardIteration4:
+    def __init__(self):
+        self.last_game_id = None
+        self.prev_vp = None
+        self.prev_settlements = None
+        self.prev_cities = None
+        self.prev_roads = None
+        self.prev_dev_cards = None
 
+    def _safe_get(self, obj, key, default=0):
+        if isinstance(obj, dict):
+            return obj.get(key, default)
+        return getattr(obj, key, default)
+
+    def _player_state(self, game, p0_color):
+        ps = game.state.player_state
+        if isinstance(ps, dict):
+            if p0_color in ps:
+                return ps[p0_color]
+            for k, v in ps.items():
+                if str(k) == str(p0_color):
+                    return v
+        return None
+
+    def _count_structures(self, game, p0_color):
+        settlements = 0
+        cities = 0
+
+        for _, b in game.state.board.buildings.items():
+            color = self._safe_get(b, "color", None)
+            btype = str(
+                self._safe_get(
+                    b,
+                    "building_type",
+                    self._safe_get(b, "type", "")
+                )
+            ).lower()
+
+            if str(color) == str(p0_color):
+                if btype.endswith("city"):
+                    cities += 1
+                else:
+                    settlements += 1
+
+        return settlements, cities
+
+    def _count_roads(self, game, p0_color):
+        roads = 0
+        road_data = getattr(game.state.board, "roads", {})
+
+        if isinstance(road_data, dict):
+            iterable = road_data.values()
+        else:
+            iterable = road_data
+
+        for r in iterable:
+            color = self._safe_get(r, "color", None)
+            if str(color) == str(p0_color):
+                roads += 1
+
+        return roads
+
+    def _count_dev_cards(self, player):
+        dev_cards = self._safe_get(
+            player,
+            "development_cards",
+            self._safe_get(player, "dev_cards", {})
+        )
+
+        if isinstance(dev_cards, dict):
+            return sum(dev_cards.values())
+
+        try:
+            return len(dev_cards)
+        except Exception:
+            return 0
+
+    def __call__(self, game, p0_color):
+        game_id = id(game)
+
+        player = self._player_state(game, p0_color)
+        if player is None:
+            return 0.0
+
+        vp = float(
+            self._safe_get(
+                player,
+                "actual_victory_points",
+                self._safe_get(
+                    player,
+                    "victory_points",
+                    self._safe_get(player, "public_victory_points", 0),
+                ),
+            )
+        )
+
+        settlements, cities = self._count_structures(game, p0_color)
+        roads = self._count_roads(game, p0_color)
+        dev_cards = self._count_dev_cards(player)
+
+        if self.last_game_id != game_id:
+            self.last_game_id = game_id
+            self.prev_vp = vp
+            self.prev_settlements = settlements
+            self.prev_cities = cities
+            self.prev_roads = roads
+            self.prev_dev_cards = dev_cards
+            return 0.0
+
+        delta_vp = vp - self.prev_vp
+        delta_settlements = settlements - self.prev_settlements
+        delta_cities = cities - self.prev_cities
+        delta_roads = roads - self.prev_roads
+        delta_dev_cards = dev_cards - self.prev_dev_cards
+
+        reward = 0.0
+
+        # Lower VP shaping so hidden/dev-card VP does not dominate.
+        reward += 1.0 * delta_vp
+
+        # Strongly prefer board development.
+        reward += 2.5 * delta_settlements
+        reward += 5.0 * delta_cities
+
+        # Small road reward because roads enable settlements.
+        reward += 0.2 * delta_roads
+
+        # Mild penalty to discourage dev-card spam.
+        # This does not ban dev cards; it just makes city/settlement play more attractive.
+        reward -= 0.3 * max(delta_dev_cards, 0)
+
+        winner = game.winning_color()
+        if winner is not None:
+            reward += 25.0 if str(winner) == str(p0_color) else -25.0
+
+        self.prev_vp = vp
+        self.prev_settlements = settlements
+        self.prev_cities = cities
+        self.prev_roads = roads
+        self.prev_dev_cards = dev_cards
+
+        return float(reward)
 # -------------------------
 # SINGLE ENV CREATOR
 # -------------------------
 def make_env():
-    reward = RewardIteration3()
+    reward = RewardIteration4()
 
     env = gym.make(
         "catanatron/Catanatron-v0",
@@ -243,8 +384,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/FFF36MR2"
-    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/FFF36MR2.pkl"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/FFF34"
+    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/FFF34.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     

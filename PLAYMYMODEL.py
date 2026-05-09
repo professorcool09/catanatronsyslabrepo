@@ -21,12 +21,12 @@ class RLPlayer(Player):
 
         model_path = model_path or os.getenv(
             "CATAN_PPO_MODEL",
-            "FINALMODEL4PLAYERS/FFF36MR2"
+            "FINALMODEL4PLAYERS/FFF34M"
         )
 
         vecnorm_path = os.getenv(
             "CATAN_VECNORM",
-            "FINALMODEL4PLAYERS/FFF36MR2.pkl"
+            "FINALMODEL4PLAYERS/FFF34.pkl"
         )
 
         self.model = MaskablePPO.load(model_path)
