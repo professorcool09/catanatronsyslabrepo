@@ -102,15 +102,13 @@ class RewardIteration2:
 
 import math
 
-class ExpansionReward:
+class RewardIteration3:
     def __init__(self):
-        self.last_game_id = None
         self.prev_vp = None
         self.prev_settlements = None
         self.prev_cities = None
         self.prev_roads = None
-        self.prev_resources = None
-        self.prev_dev_cards = None
+        self.last_game_id = None
 
     def _safe_get(self, obj, key, default=0):
         if isinstance(obj, dict):
@@ -151,7 +149,6 @@ class ExpansionReward:
 
     def _count_roads(self, game, p0_color):
         roads = 0
-
         road_data = getattr(game.state.board, "roads", {})
 
         if isinstance(road_data, dict):
@@ -166,32 +163,6 @@ class ExpansionReward:
 
         return roads
 
-    def _count_resources(self, player):
-        resources = self._safe_get(player, "resources", {})
-
-        if isinstance(resources, dict):
-            return sum(resources.values())
-
-        try:
-            return sum(resources)
-        except Exception:
-            return 0
-
-    def _count_dev_cards(self, player):
-        dev_cards = self._safe_get(
-            player,
-            "development_cards",
-            self._safe_get(player, "dev_cards", {})
-        )
-
-        if isinstance(dev_cards, dict):
-            return sum(dev_cards.values())
-
-        try:
-            return len(dev_cards)
-        except Exception:
-            return 0
-
     def __call__(self, game, p0_color):
         game_id = id(game)
 
@@ -202,10 +173,10 @@ class ExpansionReward:
         vp = float(
             self._safe_get(
                 player,
-                "victory_points",
+                "actual_victory_points",
                 self._safe_get(
                     player,
-                    "actual_victory_points",
+                    "victory_points",
                     self._safe_get(player, "public_victory_points", 0),
                 ),
             )
@@ -213,8 +184,6 @@ class ExpansionReward:
 
         settlements, cities = self._count_structures(game, p0_color)
         roads = self._count_roads(game, p0_color)
-        resources = self._count_resources(player)
-        dev_cards = self._count_dev_cards(player)
 
         if self.last_game_id != game_id:
             self.last_game_id = game_id
@@ -222,24 +191,14 @@ class ExpansionReward:
             self.prev_settlements = settlements
             self.prev_cities = cities
             self.prev_roads = roads
-            self.prev_resources = resources
-            self.prev_dev_cards = dev_cards
             return 0.0
 
         reward = 0.0
 
-        # Main progress
         reward += 2.5 * (vp - self.prev_vp)
-        reward += 1.5 * (settlements - self.prev_settlements)
-        reward += 2.5 * (cities - self.prev_cities)
-
-        # Expansion / development shaping
-        reward += 0.25 * (roads - self.prev_roads)
-        reward += 0.15 * (resources - self.prev_resources)
-        reward += 0.25 * (dev_cards - self.prev_dev_cards)
-
-        # Prefer faster wins, but keep penalty tiny
-        reward -= 0.005
+        reward += 2.0 * (settlements - self.prev_settlements)
+        reward += 3.5 * (cities - self.prev_cities)
+        reward += 0.15 * (roads - self.prev_roads)
 
         winner = game.winning_color()
         if winner is not None:
@@ -249,8 +208,6 @@ class ExpansionReward:
         self.prev_settlements = settlements
         self.prev_cities = cities
         self.prev_roads = roads
-        self.prev_resources = resources
-        self.prev_dev_cards = dev_cards
 
         return float(reward)
 
@@ -258,7 +215,7 @@ class ExpansionReward:
 # SINGLE ENV CREATOR
 # -------------------------
 def make_env():
-    reward = RewardIteration2()
+    reward = RewardIteration3()
 
     env = gym.make(
         "catanatron/Catanatron-v0",
@@ -316,8 +273,8 @@ if __name__ == "__main__":
             venv,
             device=device,
             verbose=1,
-            learning_rate=5e-5,
-            ent_coef=0.02,
+            learning_rate=1e-5,
+            ent_coef=0.005,
             n_steps=1024,
             batch_size=512,
             gamma=0.99,
@@ -328,7 +285,7 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    ms = 1
+    ms = 2
     timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
