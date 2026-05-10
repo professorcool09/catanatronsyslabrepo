@@ -333,21 +333,14 @@ class RewardIteration4:
         delta_dev_cards = dev_cards - self.prev_dev_cards
 
         reward = 0.0
-
-        # Very low VP reward so hidden/dev-card VP does not dominate learning
-        reward += 0.25 * delta_vp
-
-        # Strong board-development reward
-        reward += 5.0 * delta_settlements
-        reward += 10.0 * delta_cities
-
-        # Roads matter, but only lightly because they should lead to settlements
-        reward += 0.5 * delta_roads
-
-        # Penalize buying/accumulating dev cards to discourage dev-card spam
-        reward -= 1.0 * max(delta_dev_cards, 0)
-
         winner = game.winning_color()
+
+        reward += 1.0 * delta_vp
+        reward += 3.0 * delta_settlements
+        reward += 6.0 * delta_cities
+        reward += 0.3 * delta_roads
+        reward -= 0.25 * max(delta_dev_cards, 0)
+
         if winner is not None:
             reward += 30.0 if str(winner) == str(p0_color) else -30.0
 
@@ -432,12 +425,12 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    ms = 10
+    ms = 5
     timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save("30MR5")
-        venv.save("30MR5.pkl")
+        model.save("RRR5MR6")
+        venv.save("RRR5MR6.pkl")
         print("Training finished + saved.")
  
