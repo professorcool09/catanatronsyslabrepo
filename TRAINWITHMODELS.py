@@ -603,7 +603,7 @@ if __name__ == "__main__":
 
     N_ENVS =12
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/RRR10"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/RRR10M"
     CONTINUE_VECNORM = "FINALMODEL4PLAYERS/RRR10M.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
