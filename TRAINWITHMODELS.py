@@ -227,30 +227,34 @@ class RewardIteration4:
 
     def _player_state(self, game, p0_color):
         ps = game.state.player_state
+
         if isinstance(ps, dict):
             if p0_color in ps:
                 return ps[p0_color]
+
             for k, v in ps.items():
                 if str(k) == str(p0_color):
                     return v
+
         return None
 
     def _count_structures(self, game, p0_color):
         settlements = 0
         cities = 0
 
-        for _, b in game.state.board.buildings.items():
-            color = self._safe_get(b, "color", None)
-            btype = str(
+        for _, building in game.state.board.buildings.items():
+            color = self._safe_get(building, "color", None)
+
+            building_type = str(
                 self._safe_get(
-                    b,
+                    building,
                     "building_type",
-                    self._safe_get(b, "type", "")
+                    self._safe_get(building, "type", "")
                 )
             ).lower()
 
             if str(color) == str(p0_color):
-                if btype.endswith("city"):
+                if building_type.endswith("city"):
                     cities += 1
                 else:
                     settlements += 1
@@ -266,8 +270,9 @@ class RewardIteration4:
         else:
             iterable = road_data
 
-        for r in iterable:
-            color = self._safe_get(r, "color", None)
+        for road in iterable:
+            color = self._safe_get(road, "color", None)
+
             if str(color) == str(p0_color):
                 roads += 1
 
@@ -311,6 +316,7 @@ class RewardIteration4:
         roads = self._count_roads(game, p0_color)
         dev_cards = self._count_dev_cards(player)
 
+        # Reset memory at the start of each new game
         if self.last_game_id != game_id:
             self.last_game_id = game_id
             self.prev_vp = vp
@@ -328,15 +334,22 @@ class RewardIteration4:
 
         reward = 0.0
 
-        reward += 1.5 * delta_vp
-        reward += 3.0 * delta_settlements
-        reward += 6.0 * delta_cities
-        reward += 0.25 * delta_roads
-        reward -= 0.1 * max(delta_dev_cards, 0)
+        # Very low VP reward so hidden/dev-card VP does not dominate learning
+        reward += 0.25 * delta_vp
+
+        # Strong board-development reward
+        reward += 5.0 * delta_settlements
+        reward += 10.0 * delta_cities
+
+        # Roads matter, but only lightly because they should lead to settlements
+        reward += 0.5 * delta_roads
+
+        # Penalize buying/accumulating dev cards to discourage dev-card spam
+        reward -= 1.0 * max(delta_dev_cards, 0)
 
         winner = game.winning_color()
         if winner is not None:
-            reward += 25.0 if str(winner) == str(p0_color) else -25.0
+            reward += 30.0 if str(winner) == str(p0_color) else -30.0
 
         self.prev_vp = vp
         self.prev_settlements = settlements
@@ -357,9 +370,9 @@ def make_env():
             "reward_function": reward,
             "invalid_action_reward": -1.0,
             "enemies": [
-                ValueFunctionPlayer(Color.RED),
-                ValueFunctionPlayer(Color.ORANGE),
-                ValueFunctionPlayer(Color.WHITE),
+                RandomPlayer(Color.RED),
+                RandomPlayer(Color.ORANGE),
+                RandomPlayer(Color.BlUE),
             ],
         },
     )
@@ -377,8 +390,8 @@ if __name__ == "__main__":
 
     N_ENVS =8
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/FFF34M"
-    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/FFF34M.pkl"
+    CONTINUE_FROM = ""
+    CONTINUE_VECNORM = ""
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
@@ -407,8 +420,8 @@ if __name__ == "__main__":
             venv,
             device=device,
             verbose=1,
-            learning_rate=1e-5,
-            ent_coef=0.005,
+            learning_rate=5e-5,
+            ent_coef=0.02,
             n_steps=1024,
             batch_size=512,
             gamma=0.99,
@@ -419,12 +432,12 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    ms = 1
+    ms = 20
     timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save("FOUR_PLAYER_RANDOM_MODEL_final")
-        venv.save("four_player_random_vec_normalize.pkl")
+        model.save("30MR5")
+        venv.save("30MR5.pkl")
         print("Training finished + saved.")
  
