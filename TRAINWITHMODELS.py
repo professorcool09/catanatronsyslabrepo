@@ -210,6 +210,7 @@ class RewardIteration3:
         self.prev_roads = roads
 
         return float(reward)
+    
 class RewardIteration4:
     def __init__(self):
         self.last_game_id = None
@@ -327,19 +328,11 @@ class RewardIteration4:
 
         reward = 0.0
 
-        # Lower VP shaping so hidden/dev-card VP does not dominate.
-        reward += 1.0 * delta_vp
-
-        # Strongly prefer board development.
-        reward += 2.5 * delta_settlements
-        reward += 5.0 * delta_cities
-
-        # Small road reward because roads enable settlements.
-        reward += 0.2 * delta_roads
-
-        # Mild penalty to discourage dev-card spam.
-        # This does not ban dev cards; it just makes city/settlement play more attractive.
-        reward -= 0.3 * max(delta_dev_cards, 0)
+        reward += 1.5 * delta_vp
+        reward += 3.0 * delta_settlements
+        reward += 6.0 * delta_cities
+        reward += 0.25 * delta_roads
+        reward -= 0.1 * max(delta_dev_cards, 0)
 
         winner = game.winning_color()
         if winner is not None:
