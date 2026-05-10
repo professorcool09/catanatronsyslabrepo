@@ -583,7 +583,7 @@ def make_env():
             "reward_function": reward,
             "invalid_action_reward": -1.0,
             "enemies": [
-                WeightedRandomPlayer(Color.RED),
+                ValueFunctionPlayer(Color.RED),
                 WeightedRandomPlayer(Color.ORANGE),
                 WeightedRandomPlayer(Color.WHITE),
             ],
@@ -603,8 +603,8 @@ if __name__ == "__main__":
 
     N_ENVS =12
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/RRR13MR10"
-    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/RRR13MR10.pkl"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/RRR15MR10"
+    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/RRR15MR10.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
@@ -645,12 +645,12 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    ms = 2
+    ms = 1
     timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save("RRR15MR10")
-        venv.save("RRR15MR10.pkl")
+        model.save("RRR16MR10")
+        venv.save("RRR16MR10.pkl")
         print("Training finished + saved.")
  
