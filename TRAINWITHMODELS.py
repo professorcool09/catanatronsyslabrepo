@@ -603,8 +603,8 @@ if __name__ == "__main__":
 
     N_ENVS =12
     
-    CONTINUE_FROM = "FINALMODEL4PLAYERS/RRR15MR10"
-    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/RRR15MR10.pkl"
+    CONTINUE_FROM = "FINALMODEL4PLAYERS/WWF16MR10"
+    CONTINUE_VECNORM = "FINALMODEL4PLAYERS/WWF16MR10.pkl"
     
     venv = SubprocVecEnv([make_env for _ in range(N_ENVS)])
     
@@ -650,7 +650,7 @@ if __name__ == "__main__":
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save("RRR16MR10")
-        venv.save("RRR16MR10.pkl")
+        model.save("WWF17MR10")
+        venv.save("WWF17MR10.pkl")
         print("Training finished + saved.")
  
