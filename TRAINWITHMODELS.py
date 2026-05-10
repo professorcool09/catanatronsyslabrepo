@@ -650,7 +650,7 @@ if __name__ == "__main__":
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save("RRR13MR10")
-        venv.save("RRR13MR10.pkl")
+        model.save("RRR15MR10")
+        venv.save("RRR15MR10.pkl")
         print("Training finished + saved.")
  
