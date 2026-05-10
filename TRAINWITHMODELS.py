@@ -339,10 +339,13 @@ class RewardIteration4:
         reward += 3.0 * delta_settlements
         reward += 5.0 * delta_cities
         reward += 0.25 * delta_roads
-        reward -= 0.15 * max(delta_dev_cards, 0)
+        reward -= 0.05 * max(delta_dev_cards, 0)
+
+        # discourage endless 300+ turn games
+        reward -= 0.01
 
         if winner is not None:
-            reward += 30.0 if str(winner) == str(p0_color) else -30.0
+            reward += 50.0 if str(winner) == str(p0_color) else -50.0
 
         self.prev_vp = vp
         self.prev_settlements = settlements
@@ -381,7 +384,7 @@ if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("Using device:", device)
 
-    N_ENVS =8
+    N_ENVS =12
     
     CONTINUE_FROM = ""
     CONTINUE_VECNORM = ""
@@ -425,12 +428,12 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    ms = 3
+    ms = 2
     timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save("RRR3MR7")
-        venv.save("RRR3MR7.pkl")
+        model.save("RRR3MR8")
+        venv.save("RRR3MR8.pkl")
         print("Training finished + saved.")
  
