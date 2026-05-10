@@ -335,11 +335,11 @@ class RewardIteration4:
         reward = 0.0
         winner = game.winning_color()
 
-        reward += 1.0 * delta_vp
+        reward += 2.0 * delta_vp
         reward += 3.0 * delta_settlements
-        reward += 6.0 * delta_cities
-        reward += 0.3 * delta_roads
-        reward -= 0.25 * max(delta_dev_cards, 0)
+        reward += 5.0 * delta_cities
+        reward += 0.25 * delta_roads
+        reward -= 0.15 * max(delta_dev_cards, 0)
 
         if winner is not None:
             reward += 30.0 if str(winner) == str(p0_color) else -30.0
@@ -430,7 +430,7 @@ if __name__ == "__main__":
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
     finally:
-        model.save("RRR5MR6")
-        venv.save("RRR5MR6.pkl")
+        model.save("RRR3MR7")
+        venv.save("RRR3MR7.pkl")
         print("Training finished + saved.")
  
