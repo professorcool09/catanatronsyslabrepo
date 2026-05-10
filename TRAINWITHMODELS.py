@@ -336,12 +336,10 @@ class RewardIteration4:
         winner = game.winning_color()
 
         reward += 2.0 * delta_vp
-        reward += 3.0 * delta_settlements
-        reward += 5.0 * delta_cities
-        reward += 0.25 * delta_roads
-        reward -= 0.05 * max(delta_dev_cards, 0)
-
-        # discourage endless 300+ turn games
+        reward += 1.5 * delta_settlements
+        reward += 8.0 * delta_cities
+        reward += 0.20 * delta_roads
+        reward -= 0.02 * max(delta_dev_cards, 0)
         reward -= 0.01
 
         if winner is not None:
@@ -418,8 +416,8 @@ if __name__ == "__main__":
             verbose=1,
             learning_rate=5e-5,
             ent_coef=0.02,
-            n_steps=1024,
-            batch_size=512,
+            n_steps=2048,
+            batch_size=1024,
             gamma=0.99,
         )
 
