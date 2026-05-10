@@ -372,7 +372,7 @@ def make_env():
             "enemies": [
                 RandomPlayer(Color.RED),
                 RandomPlayer(Color.ORANGE),
-                RandomPlayer(Color.BlUE),
+                RandomPlayer(Color.WHITE),
             ],
         },
     )
@@ -432,7 +432,7 @@ if __name__ == "__main__":
         save_path="./checkpoints/",
         name_prefix="catan",
     )
-    ms = 20
+    ms = 10
     timesteps = 1000000*ms
     try:
         model.learn(total_timesteps=timesteps, callback=checkpoint_cb)
